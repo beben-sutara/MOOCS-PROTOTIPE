@@ -1,66 +1,316 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# 🎓 MoocsPangarti
 
-## About Laravel
+**Platform Pembelajaran Online (LMS) berbasis Laravel**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[![PHP](https://img.shields.io/badge/PHP-8.0.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-9.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+MoocsPangarti adalah platform **Massive Open Online Course (MOOC)** yang dibangun dengan Laravel.  
+Pengguna dapat mendaftar kursus, menyelesaikan modul, mendapatkan XP, bersaing di leaderboard, dan meraih sertifikat kelulusan.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+[📦 Instalasi](#-instalasi) • [✨ Fitur](#-fitur) • [📡 API](#-api-reference) • [🗺️ Roadmap](#-roadmap)
 
-## Learning Laravel
+</div>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## ✨ Fitur
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📚 Pembelajaran
+- ✅ **Kursus** — Buat, kelola, dan ikuti kursus dengan konten lengkap
+- ✅ **Modul & Seksi** — Atur modul ke dalam bab/seksi yang terstruktur
+- ✅ **Prerequisite Modul** — Akses modul berikutnya hanya setelah menyelesaikan modul sebelumnya
+- ✅ **Pelacakan Progress** — Progress per modul dan per kursus dicatat secara otomatis
+- ✅ **Multi-tipe Konten** — Teks, YouTube, iFrame, Video DRM, File, Audio, Quiz, Coaching, Tag
 
-## Laravel Sponsors
+### 🏆 Gamifikasi
+- ✅ **XP (Experience Points)** — Dapatkan XP setiap kali menyelesaikan modul atau kursus
+- ✅ **Sistem Level** — Naik level otomatis berdasarkan total XP yang dikumpulkan
+- ✅ **Leaderboard** — Papan peringkat global berdasarkan XP, Level, mingguan, dan per kursus
+- ✅ **Riwayat XP** — Log lengkap semua transaksi XP dengan alasannya
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### 📜 Sertifikat
+- ✅ **Sertifikat Otomatis** — Diterbitkan otomatis saat kursus diselesaikan
+- ✅ **Nomor Unik** — Setiap sertifikat memiliki nomor verifikasi unik
+- ✅ **Verifikasi Publik** — URL publik untuk memverifikasi keaslian sertifikat
+- ✅ **Template PDF** — Sertifikat dapat diunduh dalam format yang rapi
 
-### Premium Partners
+### 📝 Kuis & Asesmen
+- ✅ **Buat Kuis** — Tambahkan pertanyaan pilihan ganda ke modul
+- ✅ **Manajemen Soal** — Buat, edit, hapus soal dan pilihan jawaban
+- ✅ **Import CSV** — Import soal kuis secara massal dari file CSV
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### 👥 Manajemen Pengguna
+- ✅ **Registrasi & Login** — Autentikasi berbasis sesi dengan "ingat saya"
+- ✅ **3 Peran Pengguna** — Student, Instructor, Admin
+- ✅ **Pengajuan Instruktur** — Pengguna bisa mengajukan diri menjadi instruktur
+- ✅ **Manajemen Profil** — Edit profil dan ubah kata sandi
 
-## Contributing
+### ⚙️ Admin & Instruktur
+- ✅ **Dashboard Admin** — Statistik platform, kelola pengguna & kursus
+- ✅ **Persetujuan Kursus** — Admin approve/reject kursus sebelum dipublikasikan
+- ✅ **Persetujuan Instruktur** — Admin approve/reject pengajuan instruktur
+- ✅ **Peserta Kursus** — Lihat daftar semua pengguna yang terdaftar di kursus
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 📡 REST API
+- ✅ **15 Endpoint API** — Leaderboard, XP, modul, progress (publik & protected)
+- ✅ **Laravel Sanctum** — Autentikasi API berbasis token
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🛠️ Tech Stack
 
-## Security Vulnerabilities
+| Kategori | Teknologi |
+|----------|-----------|
+| **Backend** | PHP 8.0.2+, Laravel 9.19 |
+| **Frontend** | Blade, Bootstrap 5, Vite 4 |
+| **Database** | MySQL / MariaDB |
+| **Auth** | Laravel Sanctum, Session-based |
+| **PDF** | barryvdh/laravel-dompdf 2.2 |
+| **HTTP Client** | Axios 1.1.2 |
+| **Icons** | Bootstrap Icons |
+| **Testing** | PHPUnit 9.5 |
+| **Dev Tools** | Laravel Pint, Laravel Sail |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 👤 Peran Pengguna
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Peran | Kemampuan |
+|-------|-----------|
+| **Student** | Daftar kursus, selesaikan modul, kumpulkan XP, lihat leaderboard, unduh sertifikat |
+| **Instructor** | Semua fitur Student + buat/kelola kursus, modul, seksi, soal kuis, lihat peserta |
+| **Admin** | Semua fitur Instructor + kelola semua pengguna, approve kursus & instruktur |
+
+---
+
+## 📦 Instalasi
+
+### Prasyarat
+- PHP >= 8.0.2
+- Composer
+- MySQL / MariaDB
+- Node.js & NPM
+
+### Langkah Instalasi
+
+```bash
+# 1. Clone repository
+git clone https://github.com/beben-sutara/MOOCS-PROTOTIPE.git
+cd MOOCS-PROTOTIPE
+
+# 2. Install dependensi PHP
+composer install
+
+# 3. Install dependensi frontend
+npm install
+
+# 4. Salin file konfigurasi
+cp .env.example .env
+
+# 5. Generate application key
+php artisan key:generate
+
+# 6. Buat database MySQL
+# mysql -u root -p
+# > CREATE DATABASE moocs;
+
+# 7. Konfigurasi database di .env
+# DB_DATABASE=moocs
+# DB_USERNAME=root
+# DB_PASSWORD=your_password
+
+# 8. Jalankan migrasi & seeder
+php artisan migrate --seed
+
+# 9. Build aset frontend
+npm run build
+
+# 10. Jalankan server
+php artisan serve
+```
+
+Buka browser: **http://localhost:8000**
+
+---
+
+## ⚙️ Konfigurasi `.env`
+
+```ini
+APP_NAME=MoocsPangarti
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=moocs
+DB_USERNAME=root
+DB_PASSWORD=
+
+CACHE_DRIVER=file
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+```
+
+---
+
+## 🚀 Penggunaan
+
+### URL Utama
+
+| Halaman | URL |
+|---------|-----|
+| Beranda | `http://localhost:8000/` |
+| Login | `http://localhost:8000/login` |
+| Registrasi | `http://localhost:8000/register` |
+| Dashboard | `http://localhost:8000/dashboard` |
+| Daftar Kursus | `http://localhost:8000/courses` |
+| Leaderboard | `http://localhost:8000/leaderboard` |
+| Profil | `http://localhost:8000/profile` |
+| Sertifikat | `http://localhost:8000/certificates` |
+| Admin Dashboard | `http://localhost:8000/admin/dashboard` |
+
+### Akun Default (Seeder)
+
+| Role | Email | Password |
+|------|-------|----------|
+| Student | `user1@example.com` | `password` |
+| Instructor | `instructor@example.com` | `password` |
+| Admin | `admin@example.com` | `password` |
+
+---
+
+## 📡 API Reference
+
+### Endpoint Publik (Tanpa Autentikasi)
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/leaderboard/xp` | Top 100 pengguna berdasarkan XP |
+| GET | `/api/leaderboard/level` | Top 100 pengguna berdasarkan Level |
+| GET | `/api/leaderboard/stats` | Statistik platform |
+| GET | `/api/leaderboard/weekly` | Peringkat mingguan |
+| GET | `/api/leaderboard/course/{courseId}` | Leaderboard per kursus |
+| GET | `/api/leaderboard/level/{level}` | Pengguna berdasarkan level |
+| GET | `/api/users/{user}/xp` | Info XP pengguna tertentu |
+| GET | `/verify/{number}` | Verifikasi sertifikat |
+
+### Endpoint Protected (Membutuhkan Token Sanctum)
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/user` | Info pengguna yang sedang login |
+| GET | `/api/user/xp-summary` | Ringkasan XP pengguna |
+| GET | `/api/user/xp-logs` | Riwayat transaksi XP |
+| GET | `/api/user/rank` | Peringkat global pengguna |
+| POST | `/api/users/{user}/award-xp` | Berikan XP (admin/instruktur) |
+| GET | `/api/courses/{course}/modules` | Daftar modul kursus |
+| POST | `/api/courses/{course}/modules/{module}/complete` | Tandai modul selesai |
+
+---
+
+## 📁 Struktur Folder
+
+```
+mooc-platform/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/      # CoursesController, ModuleController, dst.
+│   │   ├── Middleware/       # CheckModuleAccess, EnsureRegularUser
+│   │   └── Kernel.php
+│   ├── Models/               # User, Course, Module, Section, Certificate, dst.
+│   ├── Policies/             # ModulePolicy
+│   └── Services/             # ModuleGatingService, CertificateService
+├── database/
+│   ├── migrations/           # Semua migrasi database
+│   └── seeders/              # Data awal
+├── resources/
+│   └── views/
+│       ├── app.blade.php     # Layout utama
+│       ├── admin/            # Halaman admin
+│       ├── auth/             # Login & register
+│       ├── certificates/     # Sertifikat
+│       ├── courses/          # Kursus
+│       ├── modules/          # Modul
+│       ├── questions/        # Soal kuis
+│       └── sections/         # Seksi
+├── routes/
+│   ├── web.php               # Route web
+│   └── api.php               # Route API
+└── tests/
+    └── Feature/              # 50+ test cases
+```
+
+---
+
+## 🗄️ Database
+
+| Tabel | Deskripsi |
+|-------|-----------|
+| `users` | Akun pengguna (role, xp, level) |
+| `courses` | Data kursus |
+| `modules` | Modul pembelajaran |
+| `sections` | Bab/seksi dalam kursus |
+| `enrollments` | Pendaftaran pengguna ke kursus |
+| `module_progress` | Progress modul per pengguna |
+| `user_xp_logs` | Riwayat transaksi XP |
+| `questions` | Soal kuis |
+| `question_options` | Pilihan jawaban kuis |
+| `certificates` | Sertifikat yang diterbitkan |
+| `instructor_applications` | Pengajuan instruktur |
+
+---
+
+## 🧪 Testing
+
+```bash
+# Jalankan semua test
+php artisan test
+
+# Jalankan test spesifik
+php artisan test --filter=LeaderboardAccessTest
+```
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Notifikasi real-time (WebSockets / Pusher)
+- [ ] Diskusi & komentar per modul
+- [ ] Sistem pembayaran kursus premium
+- [ ] Mobile app (React Native / Flutter)
+- [ ] Rekomendasi kursus berbasis AI
+- [ ] Jalur pembelajaran adaptif
+- [ ] Integrasi hosting video
+- [ ] Mode pembelajaran offline
+
+---
+
+## 🤝 Kontribusi
+
+1. Fork repository ini
+2. Buat branch fitur baru: `git checkout -b fitur/nama-fitur`
+3. Commit perubahan: `git commit -m 'Tambah fitur ...'`
+4. Push ke branch: `git push origin fitur/nama-fitur`
+5. Buat Pull Request
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dilisensikan di bawah [MIT License](https://opensource.org/licenses/MIT).
+
+---
+
+<div align="center">
+
+Dibuat dengan ❤️ menggunakan [Laravel](https://laravel.com)
+
+</div>
