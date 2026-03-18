@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Leaderboard - MOOC Platform')
+@section('title', 'Leaderboard - MoocsPangarti')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">

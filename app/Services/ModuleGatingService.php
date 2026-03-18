@@ -30,7 +30,37 @@ class ModuleGatingService
             ];
         }
 
-        // Check if module is locked
+        // Member access toggle — instructor bypasses at controller level
+        if (!$module->is_member_access) {
+            return [
+                'can_access' => false,
+                'reason'     => 'member_access_disabled',
+                'message'    => 'Modul ini sementara tidak tersedia untuk peserta.',
+            ];
+        }
+
+        // Date-based access gating (skip for instructors/admins handled at controller level)
+        $now = now();
+
+        if ($module->available_from && $now->lt($module->available_from)) {
+            return [
+                'can_access' => false,
+                'reason'     => 'not_yet_available',
+                'message'    => 'Modul ini belum dibuka. Tersedia mulai ' . $module->available_from->translatedFormat('d F Y, H:i'),
+                'available_from' => $module->available_from,
+            ];
+        }
+
+        if ($module->available_until && $now->gt($module->available_until)) {
+            return [
+                'can_access' => false,
+                'reason'     => 'access_expired',
+                'message'    => 'Akses modul ini telah ditutup sejak ' . $module->available_until->translatedFormat('d F Y, H:i'),
+                'available_until' => $module->available_until,
+            ];
+        }
+
+        // Check if module is locked (prerequisite)
         if ($module->is_locked && !$this->hasCompletedPrerequisite($user, $module)) {
             return [
                 'can_access' => false,

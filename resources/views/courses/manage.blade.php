@@ -1,26 +1,53 @@
 @extends('app')
 
-@section('title', 'Kelola Kursus - MOOC Platform')
+@section('title', 'Kelola Course - MoocsPangarti')
 
 @section('content')
-<div class="soft-panel p-4 p-lg-5 mb-4">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-        <div>
-            <span class="market-badge mb-3">
-                <i class="bi bi-kanban-fill"></i> Ruang kerja instruktur
-            </span>
-            <h1 class="section-title mb-2">Kelola seluruh kursus Anda dari satu dashboard khusus.</h1>
-            <p class="section-subtitle mb-0">Halaman ini sekarang diselaraskan dengan tema marketplace-course baru supaya alur kerja instruktur terasa lebih premium dan mudah dipindai.</p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('courses.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-book"></i> Lihat katalog
-            </a>
-            <a href="{{ route('courses.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Kursus baru
-            </a>
-        </div>
+
+{{-- Page Header --}}
+<div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
+    <div>
+        <nav aria-label="breadcrumb" class="mb-1">
+            <ol class="breadcrumb mb-0" style="font-size: 0.82rem;">
+                <li class="breadcrumb-item">
+                    <a href="/" class="text-decoration-none" style="color: var(--muted);">
+                        <i class="bi bi-house"></i> Home
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ route('courses.index') }}" class="text-decoration-none" style="color: var(--muted);">Courses</a>
+                </li>
+                <li class="breadcrumb-item active" style="color: var(--muted);">Kelola Course</li>
+            </ol>
+        </nav>
+        <h1 class="section-title mb-1">Kelola Course</h1>
+        <p class="section-subtitle mb-0">Pantau dan kelola seluruh course Anda dari satu tempat.</p>
     </div>
+    <a href="{{ route('courses.create') }}" class="btn btn-primary align-self-start mt-1">
+        <i class="bi bi-plus-circle"></i> Tambah Course
+    </a>
+</div>
+
+{{-- Sub-Navigation Tabs --}}
+<div class="courses-subnav mb-4">
+    <ul class="courses-nav-tabs">
+        <li>
+            <a href="{{ route('courses.index') }}" class="courses-nav-link">
+                <i class="bi bi-collection"></i> Semua Course
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('courses.index') }}" class="courses-nav-link">
+                <i class="bi bi-bookmark-check"></i> Course Saya
+            </a>
+        </li>
+        <li class="ms-auto">
+            <span class="courses-nav-link active" aria-current="page">
+                <i class="bi bi-kanban"></i> Kelola Course
+                <span class="courses-nav-count">{{ $manageableCourses->count() }}</span>
+            </span>
+        </li>
+    </ul>
 </div>
 
 <div class="row mb-4">
@@ -119,11 +146,11 @@
                                 <a href="{{ route('courses.show', $course) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> Lihat
                                 </a>
+                                <a href="{{ route('courses.participants', $course) }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-people"></i> Peserta
+                                </a>
                                 <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-pencil"></i> Ubah
-                                </a>
-                                <a href="{{ route('modules.create', $course) }}" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-journal-plus"></i> Modul
                                 </a>
                             </div>
                         </td>
@@ -142,4 +169,61 @@
         </table>
     </div>
 </div>
+
+<style>
+.courses-subnav {
+    border-bottom: 2px solid var(--border);
+}
+
+.courses-nav-tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 -2px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.courses-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.75rem 1.15rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.courses-nav-link:hover {
+    color: var(--primary);
+    background: rgba(164, 53, 240, 0.04);
+}
+
+.courses-nav-link.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.courses-nav-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--primary);
+    color: #fff;
+}
+</style>
 @endsection

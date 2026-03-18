@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Login - MOOC Platform')
+@section('title', 'Login - MoocsPangarti')
 
 @section('content')
 <div class="row justify-content-center">

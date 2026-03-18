@@ -310,6 +310,75 @@ class CoursesController extends Controller
     }
 
     /**
+     * Show list of participants (enrollments) for a course.
+     */
+    public function participants(Request $request, Course $course)
+    {
+        if (!$this->canManageCourse($course)) {
+            return redirect()->route('courses.manage')
+                ->with('error', 'Anda tidak memiliki akses ke daftar peserta course ini.');
+        }
+
+        $course->load('instructor');
+
+        $search = trim((string) $request->query('search', ''));
+        $statusFilter = trim((string) $request->query('status', ''));
+
+        $enrollmentsQuery = $course->enrollments()->with('user')->latest('enrolled_at');
+
+        if ($search !== '') {
+            $enrollmentsQuery->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($statusFilter !== '') {
+            $enrollmentsQuery->where('status', $statusFilter);
+        }
+
+        $enrollments = $enrollmentsQuery->get();
+
+        // Module progress per user — 2 queries total, no N+1
+        $moduleIds = $course->modules()->pluck('id');
+        $totalModules = $moduleIds->count();
+        $completedMap = [];
+        if ($totalModules > 0 && $enrollments->isNotEmpty()) {
+            $completedMap = \App\Models\ModuleProgress::query()
+                ->whereIn('user_id', $enrollments->pluck('user_id'))
+                ->whereIn('module_id', $moduleIds)
+                ->where('is_completed', true)
+                ->selectRaw('user_id, COUNT(*) as count')
+                ->groupBy('user_id')
+                ->pluck('count', 'user_id')
+                ->all();
+        }
+
+        // Stats (one aggregated query)
+        $statusCounts = $course->enrollments()
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $stats = [
+            'total'     => $statusCounts->sum(),
+            'active'    => (int) ($statusCounts['active'] ?? 0),
+            'completed' => (int) ($statusCounts['completed'] ?? 0),
+            'dropped'   => (int) ($statusCounts['dropped'] ?? 0),
+        ];
+
+        return view('courses.participants', [
+            'course'       => $course,
+            'enrollments'  => $enrollments,
+            'completedMap' => $completedMap,
+            'totalModules' => $totalModules,
+            'stats'        => $stats,
+            'search'       => $search,
+            'statusFilter' => $statusFilter,
+        ]);
+    }
+
+    /**
      * Enroll user in a course
      */
     public function enroll(Request $request, Course $course)

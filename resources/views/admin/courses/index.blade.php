@@ -1,26 +1,66 @@
 @extends('app')
 
-@section('title', 'Moderate Courses - MOOC Platform')
+@section('title', 'Moderate Courses - MoocsPangarti')
 
 @section('content')
-<div class="soft-panel p-4 p-lg-5 mb-4">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-        <div>
-            <span class="market-badge mb-3">
-                <i class="bi bi-shield-check"></i> Course moderation
-            </span>
-            <h1 class="section-title mb-2">Moderasi status course secara cepat dari dashboard admin.</h1>
-            <p class="section-subtitle mb-0">Halaman ini difokuskan untuk review global: admin bisa mencari course, melihat instructor dan statistik singkat, lalu mengubah status ke draft, published, atau archived tanpa membuka form edit penuh.</p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Admin Dashboard
-            </a>
-            <a href="{{ route('courses.manage') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-kanban"></i> Manage Courses
-            </a>
-        </div>
+<style>
+.admin-subnav { border-bottom: 2px solid var(--border); margin-bottom: 1.75rem; }
+.admin-nav-tabs { display: flex; flex-wrap: wrap; margin: 0; padding: 0; }
+.admin-nav-link {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.65rem 1.1rem; color: var(--muted); font-weight: 500;
+    font-size: 0.9rem; text-decoration: none;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: color .15s, border-color .15s; white-space: nowrap;
+}
+.admin-nav-link:hover { color: var(--primary); }
+.admin-nav-link.active { color: var(--primary); border-bottom-color: var(--primary); }
+.admin-nav-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #dc3545; color: #fff; font-size: 0.68rem; font-weight: 700;
+    border-radius: 10px; min-width: 18px; height: 18px; padding: 0 5px; line-height: 1;
+}
+</style>
+
+{{-- Page Header --}}
+<nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none text-muted">Admin Dashboard</a></li>
+        <li class="breadcrumb-item active">Moderate Courses</li>
+    </ol>
+</nav>
+<div class="d-flex flex-wrap justify-content-between align-items-center mt-2 mb-4 gap-3">
+    <div>
+        <h1 class="h3 mb-1 fw-bold">Moderate Courses</h1>
+        <p class="text-muted mb-0 small">Ubah status course ke draft, published, atau archived tanpa membuka form edit penuh.</p>
     </div>
+</div>
+
+{{-- Admin Sub-Nav --}}
+<div class="admin-subnav">
+    <nav class="admin-nav-tabs">
+        <a href="{{ route('admin.dashboard') }}" class="admin-nav-link">
+            <i class="bi bi-grid-1x2"></i> Overview
+        </a>
+        <a href="{{ route('admin.users.index') }}" class="admin-nav-link">
+            <i class="bi bi-people"></i> Users
+        </a>
+        <a href="{{ route('admin.instructor-applications.index') }}" class="admin-nav-link">
+            <i class="bi bi-person-workspace"></i> Instructor Applications
+            @isset($pendingInstructorApplications)
+                @if($pendingInstructorApplications > 0)
+                    <span class="admin-nav-badge">{{ $pendingInstructorApplications }}</span>
+                @endif
+            @endisset
+        </a>
+        <a href="{{ route('admin.courses.index') }}" class="admin-nav-link active">
+            <i class="bi bi-shield-check"></i> Moderate Courses
+        </a>
+        <a href="{{ route('courses.manage') }}" class="admin-nav-link">
+            <i class="bi bi-kanban"></i> Manage Courses
+        </a>
+    </nav>
 </div>
 
 <div class="row mb-4">
@@ -184,6 +224,9 @@
                                 <div class="d-flex gap-2">
                                     <a href="{{ route('courses.show', $course) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i> Lihat
+                                    </a>
+                                    <a href="{{ route('courses.participants', $course) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-people"></i> Peserta
                                     </a>
                                     <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-outline-secondary">
                                         <i class="bi bi-pencil"></i> Edit

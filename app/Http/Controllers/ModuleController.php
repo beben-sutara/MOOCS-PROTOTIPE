@@ -4,21 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Module;
+use App\Services\CertificateService;
 use App\Services\ModuleGatingService;
 use App\Services\XpRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ModuleController extends Controller
 {
     protected ModuleGatingService $gatingService;
     protected XpRewardService $xpRewardService;
+    protected CertificateService $certificateService;
 
-    public function __construct(ModuleGatingService $gatingService, XpRewardService $xpRewardService)
+    public function __construct(ModuleGatingService $gatingService, XpRewardService $xpRewardService, CertificateService $certificateService)
     {
         $this->gatingService = $gatingService;
         $this->xpRewardService = $xpRewardService;
+        $this->certificateService = $certificateService;
         $this->middleware('auth');
     }
 
@@ -45,11 +49,29 @@ class ModuleController extends Controller
             ->pluck('id')
             ->all();
 
+        $availableSectionIds = $course->sections()->pluck('id')->all();
+
+        $typeList = implode(',', Module::allTypes());
+
         return [
-            'title' => 'required|string|max:255',
+            'type'    => 'required|string|in:' . $typeList,
+            'title'   => 'required|string|max:255',
             'content' => 'nullable|string',
-            'order' => 'required|integer|min:0',
-            'is_locked' => 'nullable|boolean',
+            'order'   => 'required|integer|min:0',
+            'is_locked'       => 'nullable|boolean',
+            'is_preview'      => 'nullable|boolean',
+            'is_member_access'=> 'nullable|boolean',
+            'available_from'  => 'nullable|date',
+            'available_until' => 'nullable|date|after_or_equal:available_from',
+            'quiz_duration'   => 'nullable|integer|min:1|max:600',
+            // File & Audio uploads
+            'upload_file'  => 'nullable|file|max:102400',  // 100 MB
+            'upload_audio' => 'nullable|file|mimes:mp3,ogg,wav,m4a,aac|max:102400',
+            'section_id' => [
+                'nullable',
+                'integer',
+                'in:' . implode(',', $availableSectionIds ?: [0]),
+            ],
             'prerequisite_module_id' => [
                 'nullable',
                 'integer',
@@ -137,6 +159,16 @@ class ModuleController extends Controller
             ]);
         }
 
+        // Public preview — bypass enrollment & gating
+        if ($module->is_preview) {
+            return view('modules.show', [
+                'course'         => $course,
+                'module'         => $module->load('prerequisite'),
+                'canManageCourse'=> false,
+                'isPreview'      => true,
+            ]);
+        }
+
         // Check enrollment
         $enrollment = $user->enrollments()
             ->where('course_id', $course->id)
@@ -146,12 +178,10 @@ class ModuleController extends Controller
             abort(403, 'Anda belum terdaftar dalam kursus ini');
         }
 
-        // Authorization check (this is also done by middleware)
-        $this->authorize('view', $module);
-
         // Check if module can be accessed (prerequisite)
-        if (!$this->gatingService->checkModuleAccess($user, $module)) {
-            abort(403, 'Anda belum menyelesaikan modul prasyarat');
+        $access = $this->gatingService->checkModuleAccess($user, $module);
+        if (!$access['can_access']) {
+            abort(403, $access['message']);
         }
 
         // Get the current module from the request (set by middleware)
@@ -243,6 +273,8 @@ class ModuleController extends Controller
                     'completed_modules' => $courseProgress['completed'],
                 ]);
                 $courseCompleted = true;
+
+                $this->certificateService->issueCertificate($user, $course, $enrollment);
             }
 
             return [$progress, $courseProgress, $xpAwards, $courseCompleted];
@@ -257,6 +289,18 @@ class ModuleController extends Controller
             'xp_awards' => $xpAwards,
             'user_summary' => $user->fresh()->getXpSummary(),
         ];
+
+        if ($courseCompleted) {
+            $certificate = \App\Models\Certificate::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->first();
+            if ($certificate) {
+                $response['certificate'] = [
+                    'number' => $certificate->certificate_number,
+                    'url'    => route('certificates.show', $certificate),
+                ];
+            }
+        }
 
         if ($request->expectsJson()) {
             return response()->json($response);
@@ -293,6 +337,66 @@ class ModuleController extends Controller
             ->first();
     }
 
+    /** Build the JSON content string based on module type and request inputs. */
+    protected function resolveContent(Request $request, string $type, ?string $existingContent = null): ?string
+    {
+        switch ($type) {
+            case Module::TYPE_TEXT:
+                return $request->input('content') ?: null;
+
+            case Module::TYPE_YOUTUBE:
+                $url = trim($request->input('youtube_url', ''));
+                return $url ? json_encode(['url' => $url]) : null;
+
+            case Module::TYPE_IFRAME:
+                $code = trim($request->input('iframe_code', ''));
+                return $code ? json_encode(['code' => $code]) : null;
+
+            case Module::TYPE_VIDEO_DRM:
+                return json_encode([
+                    'url'      => trim($request->input('drm_url', '')),
+                    'token'    => trim($request->input('drm_token', '')),
+                    'provider' => trim($request->input('drm_provider', '')),
+                ]);
+
+            case Module::TYPE_COACHING:
+                return json_encode([
+                    'meeting_link' => trim($request->input('coaching_link', '')),
+                    'notes'        => trim($request->input('coaching_notes', '')),
+                ]);
+
+            case Module::TYPE_FILE:
+                if ($request->hasFile('upload_file')) {
+                    $file = $request->file('upload_file');
+                    $path = $file->store('modules/files', 'public');
+                    return json_encode([
+                        'path'          => $path,
+                        'original_name' => $file->getClientOriginalName(),
+                        'size'          => $file->getSize(),
+                        'mime'          => $file->getMimeType(),
+                    ]);
+                }
+                return $existingContent; // keep old file on update
+
+            case Module::TYPE_AUDIO:
+                if ($request->hasFile('upload_audio')) {
+                    $file = $request->file('upload_audio');
+                    $path = $file->store('modules/audio', 'public');
+                    return json_encode([
+                        'path'          => $path,
+                        'original_name' => $file->getClientOriginalName(),
+                        'size'          => $file->getSize(),
+                    ]);
+                }
+                return $existingContent; // keep old file on update
+
+            case Module::TYPE_QUIZ:
+            case Module::TYPE_TAG:
+            default:
+                return null;
+        }
+    }
+
     public function createForCourse(Course $course)
     {
         if (!$this->canManageCourse($course)) {
@@ -300,12 +404,34 @@ class ModuleController extends Controller
                 ->with('error', 'Anda tidak memiliki izin untuk mengelola modul course ini.');
         }
 
+        $type     = in_array(request('type'), Module::allTypes()) ? request('type') : Module::TYPE_TEXT;
+        $quickAdd = (bool) request('quick_add', false);
+
+        // Pre-select section if passed via query string
+        $presetSectionId = null;
+        if ($quickAdd && request('section_id')) {
+            $sec = $course->sections()->find((int) request('section_id'));
+            if ($sec) {
+                $presetSectionId = $sec->id;
+            }
+        }
+
+        // Auto-calculate default order
+        $baseQuery  = $presetSectionId
+            ? $course->modules()->where('section_id', $presetSectionId)
+            : $course->modules();
+        $defaultOrder = (int) $baseQuery->max('order') + 1;
+
         return view('modules.create', [
             'course' => $course,
             'module' => new Module([
-                'order' => (int) $course->modules()->max('order') + 1,
-                'is_locked' => false,
+                'type'       => $type,
+                'order'      => $defaultOrder,
+                'is_locked'  => false,
+                'section_id' => $presetSectionId,
             ]),
+            'quickAdd'           => $quickAdd,
+            'presetSectionId'    => $presetSectionId,
             'prerequisiteOptions' => $course->modules()->orderBy('order')->get(),
         ]);
     }
@@ -317,15 +443,47 @@ class ModuleController extends Controller
                 ->with('error', 'Anda tidak memiliki izin untuk mengelola modul course ini.');
         }
 
-        $validated = $request->validate($this->moduleValidationRules($course));
+        $quickAdd = $request->boolean('quick_add');
+        $rules    = $this->moduleValidationRules($course);
+
+        // In quick-add mode the order field is not shown; make it optional
+        if ($quickAdd) {
+            $rules['order'] = 'nullable|integer|min:0';
+        }
+
+        $validated = $request->validate($rules);
+        $type      = $validated['type'];
+
+        // Auto-calculate order in quick-add mode
+        $sectionId = $validated['section_id'] ?? null;
+        if ($quickAdd && !isset($validated['order'])) {
+            $baseQuery         = $sectionId
+                ? $course->modules()->where('section_id', $sectionId)
+                : $course->modules();
+            $validated['order'] = (int) $baseQuery->max('order') + 1;
+        }
 
         $module = $course->modules()->create([
-            'title' => $validated['title'],
-            'content' => $validated['content'] ?? null,
-            'order' => $validated['order'],
-            'is_locked' => $request->boolean('is_locked'),
+            'type'                   => $type,
+            'title'                  => $validated['title'],
+            'content'                => $this->resolveContent($request, $type),
+            'order'                  => $validated['order'],
+            'is_locked'              => $request->boolean('is_locked'),
+            'is_preview'             => $request->boolean('is_preview'),
+            'is_member_access'       => $request->boolean('is_member_access'),
+            'available_from'         => $validated['available_from'] ?? null,
+            'available_until'        => $validated['available_until'] ?? null,
+            'section_id'             => $sectionId,
             'prerequisite_module_id' => $validated['prerequisite_module_id'] ?? null,
+            'quiz_duration'          => $type === Module::TYPE_QUIZ ? ($validated['quiz_duration'] ?? null) : null,
+            'quiz_one_attempt'       => $type === Module::TYPE_QUIZ ? $request->boolean('quiz_one_attempt') : false,
+            'quiz_required_for_next' => $type === Module::TYPE_QUIZ ? $request->boolean('quiz_required_for_next') : false,
         ]);
+
+        if ($type === Module::TYPE_QUIZ) {
+            return redirect()->route('questions.index', [$course, $module])
+                ->with('success', "Kuis \"{$module->title}\" berhasil dibuat. Tambahkan pertanyaan di bawah ini.");
+        }
 
         return redirect()->route('courses.show', $course)
             ->with('success', "Modul {$module->title} berhasil ditambahkan.");
@@ -360,6 +518,7 @@ class ModuleController extends Controller
         }
 
         $validated = $request->validate($this->moduleValidationRules($course, $module));
+        $type = $validated['type'];
 
         $selectedPrerequisiteId = isset($validated['prerequisite_module_id'])
             ? (int) $validated['prerequisite_module_id']
@@ -374,11 +533,20 @@ class ModuleController extends Controller
         }
 
         $module->update([
-            'title' => $validated['title'],
-            'content' => $validated['content'] ?? null,
-            'order' => $validated['order'],
-            'is_locked' => $request->boolean('is_locked'),
+            'type'                  => $type,
+            'title'                 => $validated['title'],
+            'content'               => $this->resolveContent($request, $type, $module->content),
+            'order'                 => $validated['order'],
+            'is_locked'             => $request->boolean('is_locked'),
+            'is_preview'            => $request->boolean('is_preview'),
+            'is_member_access'      => $request->boolean('is_member_access'),
+            'available_from'        => $validated['available_from'] ?? null,
+            'available_until'       => $validated['available_until'] ?? null,
+            'section_id'            => $validated['section_id'] ?? null,
             'prerequisite_module_id' => $selectedPrerequisiteId,
+            'quiz_duration'          => $type === Module::TYPE_QUIZ ? ($validated['quiz_duration'] ?? null) : null,
+            'quiz_one_attempt'       => $type === Module::TYPE_QUIZ ? $request->boolean('quiz_one_attempt') : false,
+            'quiz_required_for_next' => $type === Module::TYPE_QUIZ ? $request->boolean('quiz_required_for_next') : false,
         ]);
 
         return redirect()->route('courses.show', $course)

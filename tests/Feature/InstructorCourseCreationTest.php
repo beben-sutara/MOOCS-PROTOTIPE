@@ -42,7 +42,7 @@ class InstructorCourseCreationTest extends TestCase
         $response = $this->actingAs($instructor)->get(route('courses.manage'));
 
         $response->assertOk();
-        $response->assertSee('Kelola Kursus');
+        $response->assertSee('Kelola Course');
         $response->assertSee('Course Instructor');
     }
 

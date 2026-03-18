@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Dashboard - MOOC Platform')
+@section('title', 'Dashboard - MoocsPangarti')
 
 @section('content')
 <div class="soft-panel p-4 p-lg-5 mb-4">
@@ -245,5 +245,67 @@
         </div>
     </div>
 </div>
+
+{{-- Completed Courses & Certificates (role: user only) --}}
+@if(Auth::user()->role === 'user')
+    @php
+        $completedEnrollments = Auth::user()->enrollments()
+            ->with('course')
+            ->where('status', 'completed')
+            ->latest('completed_at')
+            ->get();
+    @endphp
+    @if($completedEnrollments->isNotEmpty())
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #a435f0, #5624d0); color: white;">
+                        <h5 class="mb-0">
+                            <i class="bi bi-award-fill"></i> Sertifikat Saya
+                        </h5>
+                        <a href="{{ route('certificates.index') }}" class="btn btn-sm btn-light">
+                            Lihat Semua
+                        </a>
+                    </div>
+                    <div class="row p-3">
+                        @foreach($completedEnrollments as $enrollment)
+                            @php
+                                $cert = \App\Models\Certificate::where('user_id', Auth::id())
+                                    ->where('course_id', $enrollment->course_id)
+                                    ->first();
+                            @endphp
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <i class="bi bi-award-fill text-primary" style="font-size: 1.4rem;"></i>
+                                            <h6 class="mb-0">{{ $enrollment->course->title }}</h6>
+                                        </div>
+                                        <p class="text-muted small mb-2">
+                                            Selesai: {{ $enrollment->completed_at?->format('d M Y') ?? '-' }}
+                                        </p>
+                                        @if($cert)
+                                            <code class="text-primary small mb-3">{{ $cert->certificate_number }}</code>
+                                            <div class="d-flex gap-2 mt-auto">
+                                                <a href="{{ route('certificates.show', $cert) }}" class="btn btn-sm btn-outline-primary flex-fill">
+                                                    <i class="bi bi-eye"></i> Lihat
+                                                </a>
+                                                <a href="{{ route('certificates.download', $cert) }}" class="btn btn-sm btn-primary flex-fill">
+                                                    <i class="bi bi-download"></i> PDF
+                                                </a>
+                                            </div>
+                                        @else
+                                            <span class="badge bg-secondary">Sertifikat tidak tersedia</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+@endif
 
 @endsection

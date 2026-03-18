@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Home - MOOC Platform')
+@section('title', 'Home - MoocsPangarti')
 
 @section('content')
 {{-- Hero Section --}}

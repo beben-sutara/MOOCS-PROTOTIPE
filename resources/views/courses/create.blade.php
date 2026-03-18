@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Tambah Course - MOOC Platform')
+@section('title', 'Tambah Course - MoocsPangarti')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">

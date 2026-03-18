@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'MOOC Platform')</title>
+    <title>@yield('title', 'MoocsPangarti')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -596,7 +596,7 @@
     <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="bi bi-mortarboard-fill text-primary"></i> MOOC Platform
+                <i class="bi bi-mortarboard-fill text-primary"></i> MoocsPangarti
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -610,12 +610,6 @@
                         @if(Auth::user()->role === 'admin')
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.users.index') }}">Users</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.instructor-applications.index') }}">Instructor Applications</a>
                             </li>
                         @endif
                         <li class="nav-item">
@@ -631,9 +625,14 @@
                                 <a class="nav-link" href="{{ route('courses.manage') }}">Manage Courses</a>
                             </li>
                         @endif
-                        <li class="nav-item">
-                            <a class="nav-link" href="/leaderboard">Leaderboard</a>
-                        </li>
+                        @if(Auth::user()->role === 'user')
+                            <li class="nav-item">
+                                <a class="nav-link" href="/leaderboard">Leaderboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('certificates.index') }}">Sertifikat</a>
+                            </li>
+                        @endif
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle"></i> {{ Auth::user()->name }}
@@ -648,6 +647,7 @@
                                  @endif
                                  @if(Auth::user()->role === 'user')
                                      <li><a class="dropdown-item" href="{{ route('instructor.apply') }}">Become Instructor</a></li>
+                                     <li><a class="dropdown-item" href="{{ route('certificates.index') }}">Sertifikat Saya</a></li>
                                  @endif
                                  @if(Auth::user()->role !== 'user')
                                      <li><a class="dropdown-item" href="{{ route('courses.manage') }}">Manage Courses</a></li>
@@ -663,9 +663,6 @@
                             </ul>
                         </li>
                     @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="/leaderboard">Leaderboard</a>
-                        </li>
                         <li class="nav-item">
                             <a class="btn btn-outline-secondary btn-sm ms-lg-2" href="/login">Login</a>
                         </li>
@@ -719,7 +716,7 @@
             <div class="row g-4 align-items-start">
                 <div class="col-lg-5">
                     <h5 class="text-white mb-3">
-                        <i class="bi bi-mortarboard-fill text-primary"></i> MOOC Platform
+                        <i class="bi bi-mortarboard-fill text-primary"></i> MoocsPangarti
                     </h5>
                     <p class="mb-0">Platform pembelajaran modern untuk belajar, mengajar, dan membangun course online dengan pengalaman yang lebih profesional.</p>
                 </div>
@@ -728,7 +725,11 @@
                     <div class="d-flex flex-column gap-2">
                         <a href="/" class="text-decoration-none text-white-50">Home</a>
                         <a href="/courses" class="text-decoration-none text-white-50">Courses</a>
-                        <a href="/leaderboard" class="text-decoration-none text-white-50">Leaderboard</a>
+                        @auth
+                            @if(Auth::user()->role === 'user')
+                                <a href="/leaderboard" class="text-decoration-none text-white-50">Leaderboard</a>
+                            @endif
+                        @endauth
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -737,7 +738,7 @@
                 </div>
             </div>
             <hr class="border-secondary-subtle my-4">
-            <p class="mb-0 text-white-50">&copy; 2026 MOOC Platform. All rights reserved.</p>
+            <p class="mb-0 text-white-50">&copy; 2026 MoocsPangarti. All rights reserved.</p>
         </div>
     </footer>
 

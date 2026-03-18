@@ -131,7 +131,7 @@ class InstructorApplicationFlowTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.instructor-applications.index'));
 
         $response->assertOk();
-        $response->assertSee('Kelola pengajuan instructor');
+        $response->assertSee('Pengajuan Instructor');
         $response->assertSee('Calon Instructor');
     }
 

@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Profile - MOOC Platform')
+@section('title', 'Profile - MoocsPangarti')
 
 @section('content')
 <div class="soft-panel p-4 p-lg-5 mb-4">

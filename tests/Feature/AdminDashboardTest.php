@@ -24,8 +24,8 @@ class AdminDashboardTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Admin dashboard');
-        $response->assertSee('Platform control center');
+        $response->assertSee('Admin Dashboard');
+        $response->assertSee('Overview');
     }
 
     public function test_non_admin_cannot_view_admin_dashboard()
