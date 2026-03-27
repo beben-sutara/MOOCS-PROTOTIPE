@@ -26,6 +26,13 @@ class CourseFactory extends Factory
         ];
     }
 
+    public function published(): static
+    {
+        return $this->state(fn () => [
+            'status' => 'published',
+        ]);
+    }
+
     public function draft(): static
     {
         return $this->state(fn () => [
