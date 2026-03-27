@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -50,14 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Image upload for Editor.js (instructors & admins)
-    Route::post('/upload/image', function (\Illuminate\Http\Request $request) {
-        $request->validate(['image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120']);
-        $path = $request->file('image')->store('module-images', 'public');
-        return response()->json([
-            'success' => 1,
-            'file'    => ['url' => asset('storage/' . $path)],
-        ]);
-    })->name('upload.image');
+    Route::post('/upload/image', [ImageUploadController::class, 'store'])->name('upload.image');
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses.index');
@@ -83,7 +77,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses/{course}/participants', [CoursesController::class, 'participants'])->whereNumber('course')->name('courses.participants');
     Route::get('/courses/{course}', [CoursesController::class, 'show'])->whereNumber('course')->name('courses.show');
     Route::post('/courses/{course}/enroll', [CoursesController::class, 'enroll'])->whereNumber('course')->name('courses.enroll');
-    Route::post('/api/courses/{course}/enroll', [CoursesController::class, 'enroll'])->whereNumber('course')->name('courses.enroll.api');
     Route::post('/courses/{course}/claim-certificate', [CertificateController::class, 'claim'])->whereNumber('course')->name('courses.claim-certificate');
     
     // Sections (Bab)

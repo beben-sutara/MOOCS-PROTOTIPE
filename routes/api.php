@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserXpController;
 use App\Http\Controllers\LeaderboardController;
@@ -43,6 +44,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Award XP (instructor/admin only)
     Route::post('/users/{user}/award-xp', [UserXpController::class, 'awardXp']);
+
+    // Course enrollment via API
+    Route::post('/courses/{course}/enroll', [CoursesController::class, 'enroll'])->whereNumber('course')->name('courses.enroll');
 
     // Module Routes
     Route::prefix('courses/{course}')->group(function () {
